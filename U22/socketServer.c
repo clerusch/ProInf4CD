@@ -1,3 +1,6 @@
+//weil Clemens es vergisst
+//Dominik & Clemens
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <errno.h>
