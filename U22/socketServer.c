@@ -11,6 +11,7 @@
 #include <unistd.h>
 
 #define SOCK_PATH "com_socket"
+#define END "QUIT\n"
 
 int main(void){
     //Variablen
@@ -59,9 +60,16 @@ int main(void){
            }
 
            if (!done){
-               if (send(sock2, str, n, 0) < 0) {
+               if (strcmp(str, END)==0){
+                   printf("CLOSE\n");
+                   close(sock2);
+                   done = 1;
+               }
+               else{
+                   if (send(sock2, str, n, 0) < 0) {
                    fprintf(stderr, "Error send\n");
                    return EXIT_FAILURE;
+               }
                }
            }
         }

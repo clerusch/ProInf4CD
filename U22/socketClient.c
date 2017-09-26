@@ -34,7 +34,6 @@ int main (void){
     fprintf(stdout, "Verbindung erfolgreich!\n");
 
     while (printf("Client> "), fgets(buff, buffSize, stdin), !feof(stdin)){ //KommaOperator ist krass
-
         if (send(sock, buff, buffSize, 0)==-1){
             fprintf(stderr, "Error Client beim senden\n");
             return EXIT_FAILURE;
