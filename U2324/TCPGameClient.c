@@ -12,7 +12,7 @@
 #include <arpa/inet.h>
 
 #define SOCK_PATH "com_socket"
-#define buffSize 100
+#define buffSize 16
 #define START "START\n"
 
 int main (void){
@@ -41,8 +41,10 @@ int main (void){
     fprintf(stdout, "Verbindung erfolgreich!\n");
 
     while (1){
+        //clear buff
+        memset(buff, 0, buffSize);
         do{
-            fprintf(stdout,"Warten auf Serverstarsignal");
+            fprintf(stdout,"Warten auf Serverstarsignal\n");
             if ((t=recv(sock, buff, buffSize, 0 ))<0){
                 fprintf(stderr, "Error Client Socket erstellung\n");
                 return EXIT_FAILURE;
@@ -74,7 +76,7 @@ int main (void){
                 fprintf(stdout, "Falsche Eingabe\n");
             }
         }
-                printf("IFELSE Eingabe\n");
+                printf("77\n");
 
         if (send(sock, buff, buffSize, 0)==-1){
             fprintf(stderr, "Error Client beim senden\n");
@@ -82,7 +84,8 @@ int main (void){
         }
         printf("gesendet %s\n", buff);
         if ((t=recv(sock, buff, buffSize, 0 ))>0){
-            buff[t]='\0';
+            //buff[t]='\0';
+            printf(buff);
             fprintf(stdout, "Server> %s\n", buff);
         }
 

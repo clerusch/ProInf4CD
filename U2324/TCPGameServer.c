@@ -17,16 +17,18 @@
 #define START "START\n"
 
 int p1vsp2(char p1[], char p2[]){
+    printf(p1);
+    printf(p2);
     if(strcmp(p1, p2)==0){
         return 0;
     }
     if(strcmp(p1, "PAPIER\n")==0 && strcmp(p2, "STEIN\n")==0){
         return 1;
     }
-    if(strcmp(p1, "SCHERE\n")==0 && strcmp(p2, "PAIER\n")==0){
+    else if(strcmp(p1, "SCHERE\n")==0 && strcmp(p2, "PAPIER\n")==0){
         return 1;
     }
-    if(strcmp("STEIN\n", p1)==0 && strcmp(p2, "SCHERE\n")==0){
+    else if(strcmp("STEIN\n", p1)==0 && strcmp(p2, "SCHERE\n")==0){
         return 1;
     }
     return 2;
@@ -38,7 +40,7 @@ int main(void){
     socklen_t t;
     struct sockaddr_in local;
     struct sockaddr_storage remote;
-    char str[32],str2[32];
+    char str[16],str2[16];
 
     if((sock=socket(PF_INET, SOCK_STREAM, 0)) == -1 ){
         fprintf(stderr, "Error Socket erstellung\n");
@@ -90,6 +92,8 @@ int main(void){
         fprintf(stdout, "\nSTART\n");
         done  = 0;
         while (!done){
+            memset(str, 0, 16);
+            memset(str2, 0, 16);
             //Server sendet Start\n
             if (send(sock2, START, 6, 0) < 0) {
                 fprintf(stderr, "Error send\n");
@@ -100,10 +104,12 @@ int main(void){
                 return EXIT_FAILURE;
             }
             //Server bekommt Eingaben der Clienten
-            n = recv(sock2, str, 100, 0);
-            i = recv(sock2, str2, 100, 0);
-            fprintf(stdout, "n: %s i: %s\n",str,str2 );
-            if (n <= 0 || i <= 0) {
+            n = recv(sock2, str, 16, 0);
+            printf("sock2 Erg rec %s\n", str);
+            i = recv(sock3, str2, 16, 0);
+            printf("sock3 Erg rec %s\n", str2);
+            if ( (n <= 0) || (i <= 0) ) {
+                printf("hier sitzt der verkackte Fehler ich deinstalliere gleich meinen PC und ... %d; %d",n, i);
                 if (n < 0 || i < 0){
                     fprintf(stderr, "Error recv");
                 }
@@ -119,10 +125,12 @@ int main(void){
            else if(answer == 1){
                send(sock2, "GEWONNEN\n", 9, 0);
                send(sock3, "VERLOREN\n", 9, 0);
+               printf("Sock 2 gewonnen mit %s y", str);
            }
            else{
                send(sock2, "VERLOREN\n", 9, 0);
                send(sock3, "GEWONNEN\n", 9, 0);
+               printf("Sock 3 gewonnen mit %s y", str2);
            }
        }
 
