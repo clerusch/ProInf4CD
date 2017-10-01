@@ -14,7 +14,23 @@
 
 #define SOCK_PATH "com_socket"
 #define END "QUIT\n"
+#define START "START\n"
 
+int p1vsp2(char p1[], char p2[]){
+    if(strcmp(p1, p2)==0){
+        return 0;
+    }
+    if(strcmp(p1, "PAPIER\n")==0 && strcmp(p2, "STEIN\n")==0){
+        return 1;
+    }
+    if(strcmp(p1, "SCHERE\n")==0 && strcmp(p2, "PAIER\n")==0){
+        return 1;
+    }
+    if(strcmp("STEIN\n", p1)==0 && strcmp(p2, "SCHERE\n")==0){
+        return 1;
+    }
+    return 2;
+}
 
 int main(void){
     //Variablen
@@ -22,7 +38,7 @@ int main(void){
     socklen_t t;
     struct sockaddr_in local;
     struct sockaddr_storage remote;
-    char str[32];
+    char str[32],str2[32];
 
     if((sock=socket(PF_INET, SOCK_STREAM, 0)) == -1 ){
         fprintf(stderr, "Error Socket erstellung\n");
@@ -45,7 +61,7 @@ int main(void){
         return EXIT_FAILURE;
     }
 
-    int done, n;
+    int done, n, i, answer;
     char s2A = 0;
     char s3A = 0;
     while(1){
@@ -54,7 +70,6 @@ int main(void){
         t = sizeof(remote);
         if (s2A == 0){
             s2A = 1;
-            printf("s2A %d\n", s2A );
             if ((sock2 = accept(sock, (struct sockaddr *)&remote, &t)) == -1) {
 
                 fprintf(stderr, "Error Accept\n");
@@ -65,7 +80,6 @@ int main(void){
 
         if (s3A == 0){
             s3A = 1;
-            printf("s3A %d\n", s3A );
             if ((sock3 = accept(sock, (struct sockaddr *)&remote, &t)) == -1) {
 
                 fprintf(stderr, "Error Accept\n");
@@ -76,57 +90,40 @@ int main(void){
         fprintf(stdout, "\nSTART\n");
         done  = 0;
         while (!done){
+            //Server sendet Start\n
+            if (send(sock2, START, 6, 0) < 0) {
+                fprintf(stderr, "Error send\n");
+                return EXIT_FAILURE;
+            }
+            if (send(sock3, START, 6, 0) < 0) {
+                fprintf(stderr, "Error send\n");
+                return EXIT_FAILURE;
+            }
+            //Server bekommt Eingaben der Clienten
             n = recv(sock2, str, 100, 0);
-            if (n <= 0) {
-                if (n < 0){
+            i = recv(sock2, str2, 100, 0);
+            if (n <= 0 || i <= 0) {
+                if (n < 0 || i < 0){
                     fprintf(stderr, "Error recv");
                 }
                 done = 1;
            }
-
-           if (!done){
-               if (strcmp(str, END)==0){
-                   printf("CLOSE\n");
-                   s2A = 0;
-                   close(sock2);
-                   done = 1;
-               }
-               else{
-                    if (send(sock2, str, n, 0) < 0) {
-                    fprintf(stderr, "Error send\n");
-                    return EXIT_FAILURE;
-                    }
-               }
+           //Server berrechnet das Ergebnis
+           answer = p1vsp2(str, str2);
+           //Server sendet das Ergebnis
+           if(answer == 0){
+               send(sock2, "UNENTSCHIEDEN\n", 14, 0);
+               send(sock3, "UNENTSCHIEDEN\n", 14, 0);
            }
-           //Sock3
-           n = recv(sock3, str, 100, 0);
-           if (n <= 0) {
-               if (n < 0){
-                   fprintf(stderr, "Error recv");
-               }
-               done = 1;
-          }
-
-          if (!done){
-              if (strcmp(str, END)==0){
-                  printf("CLOSE\n");
-                  s2A = 0;
-                  close(sock3);
-                  done = 1;
-              }
-              else{
-                   if (send(sock3, str, n, 0) < 0) {
-                   fprintf(stderr, "Error send\n");
-                   return EXIT_FAILURE;
-                   }
-              }
-          }
-
-
-
-
-
-        }
+           else if(answer == 1){
+               send(sock2, "GEWONNEN\n", 9, 0);
+               send(sock3, "VERLOREN\n", 9, 0);
+           }
+           else{
+               send(sock2, "VERLOREN\n", 9, 0);
+               send(sock3, "GEWONNEN\n", 9, 0);
+           }
+       }
 
     }
 
