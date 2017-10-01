@@ -48,14 +48,14 @@ int main (void){
                 return EXIT_FAILURE;
             }
         }
-        while(strcmp(buff, START)!=0);
+        while(strcmp(buff, "START\n")!=0);
         //Eingabe des Benutzers
         while(1){
             fprintf(stdout, "Spiel gestartet\nSCHERE, STEIN oder PAPIER - QUIT zum Beenden\n");
             printf("vor fgels\n");
             fgets(buff, buffSize, stdin);
             fprintf(stdout, "nach fgets %s ", buff);
-            if (strcmp(buff,"SCHERE\n")==0 || strcmp(buff,"STEIN\n")==0 || strcmp(buff, "PAPIER")==0){
+            if ( (strcmp(buff,"SCHERE\n")==0) || (strcmp(buff,"STEIN\n")==0) || (strcmp(buff, "PAPIER\n")==0) ){
                 printf("if");
                 break;
             }
@@ -74,13 +74,13 @@ int main (void){
                 fprintf(stdout, "Falsche Eingabe\n");
             }
         }
-                printf("IFELSE Eingabe");
+                printf("IFELSE Eingabe\n");
 
         if (send(sock, buff, buffSize, 0)==-1){
             fprintf(stderr, "Error Client beim senden\n");
             return EXIT_FAILURE;
         }
-        printf("gesendet");
+        printf("gesendet %s\n", buff);
         if ((t=recv(sock, buff, buffSize, 0 ))>0){
             buff[t]='\0';
             fprintf(stdout, "Server> %s\n", buff);

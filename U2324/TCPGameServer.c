@@ -102,6 +102,7 @@ int main(void){
             //Server bekommt Eingaben der Clienten
             n = recv(sock2, str, 100, 0);
             i = recv(sock2, str2, 100, 0);
+            fprintf(stdout, "n: %s i: %s\n",str,str2 );
             if (n <= 0 || i <= 0) {
                 if (n < 0 || i < 0){
                     fprintf(stderr, "Error recv");
