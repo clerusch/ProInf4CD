@@ -13,6 +13,7 @@
 #define SOCK_PATH "com_socket"
 #define END "QUIT\n"
 
+
 int main(void){
     //Variablen
     int sock, sock2, len;
